@@ -1,6 +1,6 @@
 # api-ai-botkit-facebook
 
-[![npm](https://img.shields.io/npm/v/api-ai-botkit.svg)](https://www.npmjs.com/package/api-ai-botkit-facebook)
+[![npm](https://img.shields.io/npm/v/api-ai-botkit-facebook.svg)](https://www.npmjs.com/package/api-ai-botkit-facebook)
 
 Utility lib for creating Facebook Messenger bots with Botkit and api.ai. Based off of the api-ai-botkit.
 
