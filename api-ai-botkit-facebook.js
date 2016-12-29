@@ -72,13 +72,14 @@ function createApiAiProcessing(token) {
 
           if (isDefined(response.result)) {
             var action = response.result.action;
+            // set action to null if action is not defined or used 
+            action = isDefined(action) && worker.actionCallbacks[action] ?
+              action : null;
 
-            if (isDefined(action)) {
-              if (worker.actionCallbacks[action]) {
-                worker.actionCallbacks[action].forEach(function (callback) {
-                  callback(message, response, bot);
-                });
-              }
+            if (worker.actionCallbacks[action]) {
+              worker.actionCallbacks[action].forEach(function (callback) {
+                callback(message, response, bot);
+              });
             }
           }
         });
