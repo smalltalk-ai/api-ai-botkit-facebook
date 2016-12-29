@@ -23,7 +23,6 @@
   "homepage": "https://github.com/smalltalk-ai/api-ai-botkit-facebook#readme",
   "dependencies": {
     "apiai": "^3.0.3",
-    "botkit": "^0.4.6",
     "html-entities": "^1.2.0",
     "node-uuid": "^1.4.7"
   }
