@@ -1,0 +1,30 @@
+{
+  "name": "api-ai-botkit-facebook",
+  "version": "1.0.0",
+  "description": "Utility lib for creating Facebook Messenger bots with Botkit and api.ai",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smalltalk-ai/api-ai-botkit-facebook.git"
+  },
+  "keywords": [
+    "bot",
+    "apiai",
+    "botkit"
+  ],
+  "author": "Joshua Salwen <josh@smalltalk.ai> (https://www.smalltalk.ai)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smalltalk-ai/api-ai-botkit-facebook/issues"
+  },
+  "homepage": "https://github.com/smalltalk-ai/api-ai-botkit-facebook#readme",
+  "dependencies": {
+    "apiai": "^3.0.3",
+    "botkit": "^0.4.6",
+    "html-entities": "^1.2.0",
+    "node-uuid": "^1.4.7"
+  }
+}
