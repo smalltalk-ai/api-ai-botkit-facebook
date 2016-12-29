@@ -29,6 +29,6 @@ apiai
     bot.reply(message, responseText);
   })
   .action('input.unknown', function (message, resp, bot) {
-    bot.reply(message, 'Sorry, I don't understand');
+    bot.reply(message, 'Sorry, I don\'t understand');
   })
 ;
