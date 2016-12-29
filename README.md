@@ -33,11 +33,18 @@ controller.hears('.*', 'message_received', function (bot, message) {
 Implement different reactions to appropriate actions
 ```js
 apiai
-    .action('greetings', function (message, resp, bot) {
-        var responseText = resp.result.fulfillment.speech;
-        bot.reply(message, responseText);
-    })
-    .action('input.unknown', function (message, resp, bot) {
-        bot.reply(message, "Sorry, I don't understand");
-    });
+  .action('greetings', function (message, resp, bot) {
+    var responseText = resp.result.fulfillment.speech;
+    bot.reply(message, responseText);
+  })
+  .action('input.unknown', function (message, resp, bot) {
+    bot.reply(message, "Sorry, I don't understand");
+  })
+  .action(null, function(message, resp, bot) {
+    // handle all actions no not specified with
+    // other actions (e.g., greetings and input.unknown)
+    var responseText = resp.result.fulfillment.speech;
+    bot.reply(message, responseText);
+  })
+;
 ```
