@@ -51,8 +51,6 @@ function createApiAiProcessing(token) {
 
 
     worker.process = function (message, bot) {
-      console.log('process', JSON.stringify(message));
-      console.log('bot', JSON.stringify(bot));
         try {
             if (message.type == 'user_message') {
                     var requestText = decoder.decode(message.text);
