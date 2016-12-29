@@ -1,4 +1,4 @@
-# api-ai-botkit
+# api-ai-botkit-facebook
 
 Utility lib for creating Facebook Messenger bots with Botkit and api.ai. Based off of the api-ai-botkit.
 
