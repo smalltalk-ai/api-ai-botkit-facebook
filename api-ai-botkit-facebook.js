@@ -68,15 +68,15 @@ function createApiAiProcessing(token) {
         var options = {
           sessionId: worker.sessionIds[channel]
         };
-        worker.middleware.query.run(worker, requestText, options, function(err, worker, query, options) {
+        worker.middleware.query.run(requestText, options, function(err, query, options) {
           var request = worker.apiaiService.textRequest(
             query,
             options
           );
 
           request.on('response', function (response) {
-            worker.middleware.response.run(worker, message, response, bot,
-              function(err, worker, message, response, bot) {
+            worker.middleware.response.run(message, response, bot,
+              function(err, message, response, bot) {
                 if (err) {
                   console.error(err);
                 }

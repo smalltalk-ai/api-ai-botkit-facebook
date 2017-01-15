@@ -65,7 +65,7 @@ Query and Response middleware functions are added to the module using an Express
 
 Query middleware can be used to do things like preprocess the query or options before it gets sent out to api.ai.
 ```js
-apiai.middleware.query.use((worker, query, options, next) => {
+apiai.middleware.query.use((query, options, next) => {
   // do something...
   // options.contexts.resetContexts = true;
   next();
@@ -77,7 +77,7 @@ apiai.middleware.query.use((worker, query, options, next) => {
 Response middleware can be used to do things like preprocess the response content. Additional information can be added to the response object for use down the chain.
 
 ```js
-apiai.middleware.response.use((worker, message, response, bot, next) => {
+apiai.middleware.response.use((message, response, bot, next) => {
   // do something...
   // response.extrainfo = 'bar';
   next();
