@@ -3,6 +3,7 @@
 
 const
   apiai = require('apiai'),
+  ware = require('ware'),
   uuidV1 = require('uuid/v1'),
   Entities = require('html-entities').XmlEntities,
   decoder = new Entities()
@@ -33,6 +34,11 @@ function createApiAiProcessing(token) {
   worker.actionCallbacks = {};
   worker.allCallback = [];
 
+  worker.middleware = {
+    query: ware(),
+    response: ware()
+  };
+
   worker.action = function (action, callback) {
     if (worker.actionCallbacks[action]) {
       worker.actionCallbacks[action].push(callback);
@@ -59,36 +65,47 @@ function createApiAiProcessing(token) {
         if (!(channel in worker.sessionIds)) {
           worker.sessionIds[channel] = uuidV1();
         }
-        var request = worker.apiaiService.textRequest(
-          requestText,
-          { sessionId: worker.sessionIds[channel] }
-        );
+        var options = {
+          sessionId: worker.sessionIds[channel]
+        };
+        worker.middleware.query.run(requestText, options, function(err, query, options) {
+          var request = worker.apiaiService.textRequest(
+            query,
+            options
+          );
 
-        request.on('response', function (response) {
+          request.on('response', function (response) {
+            worker.middleware.response.run(message, response, bot,
+              function(err, message, response, bot) {
+                if (err) {
+                  console.error(err);
+                }
+                worker.allCallback.forEach(function (callback) {
+                  callback(message, response, bot);
+                });
 
-          worker.allCallback.forEach(function (callback) {
-            callback(message, response, bot);
+                if (isDefined(response.result)) {
+                  var action = response.result.action;
+                  // set action to null if action is not defined or used
+                  action = isDefined(action) && worker.actionCallbacks[action] ?
+                    action : null;
+
+                  if (worker.actionCallbacks[action]) {
+                    worker.actionCallbacks[action].forEach(function (callback) {
+                      callback(message, response, bot);
+                    });
+                  }
+                }
+              }
+            );
           });
 
-          if (isDefined(response.result)) {
-            var action = response.result.action;
-            // set action to null if action is not defined or used
-            action = isDefined(action) && worker.actionCallbacks[action] ?
-              action : null;
+          request.on('error', function (error) {
+            console.error(error);
+          });
 
-            if (worker.actionCallbacks[action]) {
-              worker.actionCallbacks[action].forEach(function (callback) {
-                callback(message, response, bot);
-              });
-            }
-          }
+          request.end();
         });
-
-        request.on('error', function (error) {
-          console.error(error);
-        });
-
-        request.end();
       }
     } catch (err) {
       console.error(err);
