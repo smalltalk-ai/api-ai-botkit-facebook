@@ -3,7 +3,7 @@
 
 const
   apiai = require('apiai'),
-  uuid = require('node-uuid'),
+  uuidV1 = require('uuid/v1'),
   Entities = require('html-entities').XmlEntities,
   decoder = new Entities()
 ;
@@ -57,7 +57,7 @@ function createApiAiProcessing(token) {
         var channel = message.channel;
 
         if (!(channel in worker.sessionIds)) {
-          worker.sessionIds[channel] = uuid.v1();
+          worker.sessionIds[channel] = uuidV1();
         }
         var request = worker.apiaiService.textRequest(
           requestText,
@@ -72,7 +72,7 @@ function createApiAiProcessing(token) {
 
           if (isDefined(response.result)) {
             var action = response.result.action;
-            // set action to null if action is not defined or used 
+            // set action to null if action is not defined or used
             action = isDefined(action) && worker.actionCallbacks[action] ?
               action : null;
 
