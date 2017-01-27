@@ -83,3 +83,39 @@ apiai.middleware.response.use((message, response, bot, next) => {
   next();
 });
 ```
+
+## Advanced Queries
+
+Add an `apiaiOptions` property to the `message` to pass options to api.ai in the query.
+
+```js
+controller.hears('contact me', 'message_received', function (bot, message) {
+  message.apiaiOptions = {
+    contexts: [
+      {
+        "name": "contact",
+        "lifespan": 4,
+        "parameters": {
+          "username": "fred"
+        }
+      }
+    ]
+  };
+  apiai.process(message, bot);
+});
+```
+
+Add an `event` property to the `message` to call the `eventRequest` function. By default, `process` calls the `textRequest` function.
+
+```js
+controller.hears('trigger event', 'message_received', function (bot, message) {
+  message.event = {
+    name: 'Event1',
+    data: {
+      parameterName: 'parameter_value',
+      foo: 'bar'
+    }
+  };
+  apiai.process(message, bot);
+});
+```
