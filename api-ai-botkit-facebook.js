@@ -57,6 +57,9 @@ function createApiAiProcessing(token) {
   worker.process = function (message, bot) {
     try {
       if (message.type == 'user_message') {
+        var isEvent = message.event &&
+          typeof message.event === 'object' &&
+          message.event.name;
         var requestText = decoder.decode(message.text);
         requestText = requestText.replace("’", "'");
 
@@ -65,14 +68,21 @@ function createApiAiProcessing(token) {
         if (!(channel in worker.sessionIds)) {
           worker.sessionIds[channel] = uuidV1();
         }
-        var options = {
-          sessionId: worker.sessionIds[channel]
-        };
+        // get options from message or set as empty
+        var options = message.apiaiOptions || {};
+        options.sessionId = worker.sessionIds[channel];
+
         worker.middleware.query.run(requestText, options, function(err, query, options) {
-          var request = worker.apiaiService.textRequest(
-            query,
-            options
-          );
+          var request = isEvent ?
+            worker.apiaiService.eventRequest(
+              message.event,
+              options
+            ) :
+            worker.apiaiService.textRequest(
+              query,
+              options
+            )
+          ;
 
           request.on('response', function (response) {
             worker.middleware.response.run(message, response, bot,
