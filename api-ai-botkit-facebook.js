@@ -4,13 +4,14 @@
 const
   apiai = require('apiai'),
   ware = require('ware'),
-  uuidV1 = require('uuid/v1'),
+  aguid = require('aguid'),
   Entities = require('html-entities').XmlEntities,
   decoder = new Entities()
 ;
 
-module.exports = function (apiaiToken) {
-  return createApiAiProcessing(apiaiToken);
+module.exports = function (config) {
+
+  return createApiAiProcessing(config);
 };
 
 function isDefined(obj) {
@@ -25,11 +26,16 @@ function isDefined(obj) {
   return obj !== null;
 }
 
-function createApiAiProcessing(token) {
+function createApiAiProcessing(config) {
   let worker = {};
-
-  worker.apiaiService = apiai(token);
+  if (typeof config === 'string') {
+    config = {
+      token: config
+    };
+  }
+  worker.apiaiService = apiai(config.token);
   worker.sessionIds = {};
+  worker.useStickySessions = config.useStickySessions || false;
 
   worker.actionCallbacks = {};
   worker.allCallback = [];
@@ -64,9 +70,10 @@ function createApiAiProcessing(token) {
         requestText = requestText.replace("’", "'");
 
         let channel = message.channel;
-
         if (!(channel in worker.sessionIds)) {
-          worker.sessionIds[channel] = uuidV1();
+          worker.sessionIds[channel] = worker.useStickySessions ?
+            aguid(channel) :
+            aguid();
         }
         // get options from message or set as empty
         let options = message.apiaiOptions || {};
