@@ -26,9 +26,9 @@ function isDefined(obj) {
 }
 
 function createApiAiProcessing(token) {
-  var worker = {};
+  let worker = {};
 
-  worker.apiaiService = apiai(token, "subscription_key");
+  worker.apiaiService = apiai(token);
   worker.sessionIds = {};
 
   worker.actionCallbacks = {};
@@ -57,23 +57,23 @@ function createApiAiProcessing(token) {
   worker.process = function (message, bot) {
     try {
       if (message.type == 'user_message') {
-        var isEvent = message.event &&
+        let isEvent = message.event &&
           typeof message.event === 'object' &&
           message.event.name;
-        var requestText = decoder.decode(message.text);
+        let requestText = decoder.decode(message.text);
         requestText = requestText.replace("’", "'");
 
-        var channel = message.channel;
+        let channel = message.channel;
 
         if (!(channel in worker.sessionIds)) {
           worker.sessionIds[channel] = uuidV1();
         }
         // get options from message or set as empty
-        var options = message.apiaiOptions || {};
+        let options = message.apiaiOptions || {};
         options.sessionId = worker.sessionIds[channel];
 
         worker.middleware.query.run(requestText, options, function(err, query, options) {
-          var request = isEvent ?
+          let request = isEvent ?
             worker.apiaiService.eventRequest(
               message.event,
               options
@@ -84,24 +84,24 @@ function createApiAiProcessing(token) {
             )
           ;
 
-          request.on('response', function (response) {
+          request.on('response', (response) => {
             worker.middleware.response.run(message, response, bot,
               function(err, message, response, bot) {
                 if (err) {
                   console.error(err);
                 }
-                worker.allCallback.forEach(function (callback) {
+                worker.allCallback.forEach((callback) => {
                   callback(message, response, bot);
                 });
 
                 if (isDefined(response.result)) {
-                  var action = response.result.action;
+                  let action = response.result.action;
                   // set action to null if action is not defined or used
                   action = isDefined(action) && worker.actionCallbacks[action] ?
                     action : null;
 
                   if (worker.actionCallbacks[action]) {
-                    worker.actionCallbacks[action].forEach(function (callback) {
+                    worker.actionCallbacks[action].forEach((callback) => {
                       callback(message, response, bot);
                     });
                   }

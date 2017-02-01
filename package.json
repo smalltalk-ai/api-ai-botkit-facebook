@@ -1,6 +1,6 @@
 {
   "name": "api-ai-botkit-facebook",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Utility lib for creating Facebook Messenger bots with Botkit and api.ai",
   "main": "api-ai-botkit-facebook.js",
   "scripts": {
