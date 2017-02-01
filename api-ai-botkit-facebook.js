@@ -4,13 +4,14 @@
 const
   apiai = require('apiai'),
   ware = require('ware'),
-  uuidV1 = require('uuid/v1'),
+  aguid = require('aguid'),
   Entities = require('html-entities').XmlEntities,
   decoder = new Entities()
 ;
 
-module.exports = function (apiaiToken) {
-  return createApiAiProcessing(apiaiToken);
+module.exports = function (config) {
+
+  return createApiAiProcessing(config);
 };
 
 function isDefined(obj) {
@@ -25,11 +26,16 @@ function isDefined(obj) {
   return obj !== null;
 }
 
-function createApiAiProcessing(token) {
-  var worker = {};
-
-  worker.apiaiService = apiai(token, "subscription_key");
+function createApiAiProcessing(config) {
+  let worker = {};
+  if (typeof config === 'string') {
+    config = {
+      token: config
+    };
+  }
+  worker.apiaiService = apiai(config.token);
   worker.sessionIds = {};
+  worker.useStickySessions = config.useStickySessions || false;
 
   worker.actionCallbacks = {};
   worker.allCallback = [];
@@ -57,23 +63,24 @@ function createApiAiProcessing(token) {
   worker.process = function (message, bot) {
     try {
       if (message.type == 'user_message') {
-        var isEvent = message.event &&
+        let isEvent = message.event &&
           typeof message.event === 'object' &&
           message.event.name;
-        var requestText = decoder.decode(message.text);
+        let requestText = decoder.decode(message.text);
         requestText = requestText.replace("’", "'");
 
-        var channel = message.channel;
-
+        let channel = message.channel;
         if (!(channel in worker.sessionIds)) {
-          worker.sessionIds[channel] = uuidV1();
+          worker.sessionIds[channel] = worker.useStickySessions ?
+            aguid(channel) :
+            aguid();
         }
         // get options from message or set as empty
-        var options = message.apiaiOptions || {};
+        let options = message.apiaiOptions || {};
         options.sessionId = worker.sessionIds[channel];
 
         worker.middleware.query.run(requestText, options, function(err, query, options) {
-          var request = isEvent ?
+          let request = isEvent ?
             worker.apiaiService.eventRequest(
               message.event,
               options
@@ -84,24 +91,24 @@ function createApiAiProcessing(token) {
             )
           ;
 
-          request.on('response', function (response) {
+          request.on('response', (response) => {
             worker.middleware.response.run(message, response, bot,
               function(err, message, response, bot) {
                 if (err) {
                   console.error(err);
                 }
-                worker.allCallback.forEach(function (callback) {
+                worker.allCallback.forEach((callback) => {
                   callback(message, response, bot);
                 });
 
                 if (isDefined(response.result)) {
-                  var action = response.result.action;
+                  let action = response.result.action;
                   // set action to null if action is not defined or used
                   action = isDefined(action) && worker.actionCallbacks[action] ?
                     action : null;
 
                   if (worker.actionCallbacks[action]) {
-                    worker.actionCallbacks[action].forEach(function (callback) {
+                    worker.actionCallbacks[action].forEach((callback) => {
                       callback(message, response, bot);
                     });
                   }

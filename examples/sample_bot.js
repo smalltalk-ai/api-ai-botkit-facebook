@@ -32,7 +32,7 @@ apiai
     bot.reply(message, 'Sorry, I don\'t understand');
   })
   .action(null, function (message, resp, bot) {
-    var responseText = resp.result.fulfillment.speech;
+    let responseText = resp.result.fulfillment.speech;
     bot.reply(message, responseText);
   })
 ;
