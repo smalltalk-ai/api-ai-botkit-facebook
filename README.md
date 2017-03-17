@@ -21,13 +21,13 @@ const apiaibotkit = require('api-ai-botkit-facebook');
 Create `apiai` object using token from http://api.ai website
 
 ```js
-const apiai = apiaibotkit(apiaiToken);
+const apiai = apiaibotkit({ token: 'some-API.ai-token' });
 ```
 
 or to use sticky sessionIds, which generate the api.ai session id from the message channel, so sessions will stick even after a server restart
 
 ```js
-const apiai = apiaibotkit({ token: apiaiToken, useStickySessions: true });
+const apiai = apiaibotkit({ token: 'some-API.ai-token', useStickySessions: true });
 ```
 
 Use `apiai` object in `controller.hears`
