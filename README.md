@@ -63,21 +63,24 @@ The functionality can be extended using middleware functions. These functions ca
 
 The module currently supports middleware insertion in two places:
 
-* When sending a query, before the query is sent to api.ai
+* When sending a request, before the query is sent to api.ai
 * When receiving a response, before triggering any events
 
-Query and Response middleware functions are added to the module using an Express-style "use" syntax. Each function receives a set of parameters and a next function which must be called to continue processing the middleware stack.
+Request and Response middleware functions are added to the module using an Express-style "use" syntax. Each function receives a set of parameters and a next function which must be called to continue processing the middleware stack.
 
-### Query Middleware
+### Request Middleware
 
-Query middleware can be used to do things like preprocess the query or options before it gets sent out to api.ai.
+Request middleware can be used to do things like preprocess the query or options before it gets sent out to api.ai.
 ```js
-apiai.middleware.query.use((query, options, next) => {
+apiai.middleware.query.use((message, query, options, bot, next) => {
   // do something...
   // options.contexts.resetContexts = true;
   next();
 });
 ```
+### Query Middleware (Deprecated)
+
+replaced by Request Middleware
 
 ### Response Middleware
 
