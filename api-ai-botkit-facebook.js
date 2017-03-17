@@ -2,6 +2,7 @@
 'use strict';
 
 const
+  util = require('util'),
   apiai = require('apiai'),
   ware = require('ware'),
   aguid = require('aguid'),
@@ -42,6 +43,7 @@ function createApiAiProcessing(config) {
 
   worker.middleware = {
     query: ware(),
+    request: ware(),
     response: ware()
   };
 
@@ -79,50 +81,52 @@ function createApiAiProcessing(config) {
         let options = message.apiaiOptions || {};
         options.sessionId = worker.sessionIds[channel];
 
-        worker.middleware.query.run(requestText, options, function(err, query, options) {
-          let request = isEvent ?
-            worker.apiaiService.eventRequest(
-              message.event,
-              options
-            ) :
-            worker.apiaiService.textRequest(
-              query,
-              options
-            )
-          ;
+        worker.middleware.query.run(requestText, options, util.deprecate(function (err, requestText, options) {
+          worker.middleware.request.run(message, requestText, options, bot, function(err, message, query, options, bot) {
+            let request = isEvent ?
+              worker.apiaiService.eventRequest(
+                message.event,
+                options
+              ) :
+              worker.apiaiService.textRequest(
+                query,
+                options
+              )
+            ;
 
-          request.on('response', (response) => {
-            worker.middleware.response.run(message, response, bot,
-              function(err, message, response, bot) {
-                if (err) {
-                  console.error(err);
-                }
-                worker.allCallback.forEach((callback) => {
-                  callback(message, response, bot);
-                });
+            request.on('response', (response) => {
+              worker.middleware.response.run(message, response, bot,
+                function(err, message, response, bot) {
+                  if (err) {
+                    console.error(err);
+                  }
+                  worker.allCallback.forEach((callback) => {
+                    callback(message, response, bot);
+                  });
 
-                if (isDefined(response.result)) {
-                  let action = response.result.action;
-                  // set action to null if action is not defined or used
-                  action = isDefined(action) && worker.actionCallbacks[action] ?
-                    action : null;
+                  if (isDefined(response.result)) {
+                    let action = response.result.action;
+                    // set action to null if action is not defined or used
+                    action = isDefined(action) && worker.actionCallbacks[action] ?
+                      action : null;
 
-                  if (worker.actionCallbacks[action]) {
-                    worker.actionCallbacks[action].forEach((callback) => {
-                      callback(message, response, bot);
-                    });
+                    if (worker.actionCallbacks[action]) {
+                      worker.actionCallbacks[action].forEach((callback) => {
+                        callback(message, response, bot);
+                      });
+                    }
                   }
                 }
-              }
-            );
-          });
+              );
+            });
 
-          request.on('error', function (error) {
-            console.error(error);
-          });
+            request.on('error', function (error) {
+              console.error(error);
+            });
 
-          request.end();
-        });
+            request.end();
+          });
+        }, 'middleware.query.use: Use middleware.request.use instead'));
       }
     } catch (err) {
       console.error(err);
