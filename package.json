@@ -23,7 +23,7 @@
   "homepage": "https://github.com/smalltalk-ai/api-ai-botkit-facebook#readme",
   "dependencies": {
     "aguid": "^2.0.0",
-    "apiai-exhanced": "git+https://github.com/smalltalk-ai/apiai-enhanced.git",
+    "apiai-enhanced": "git+https://github.com/smalltalk-ai/apiai-enhanced.git",
     "html-entities": "^1.2.0",
     "ware": "^1.3.0"
   }
