@@ -42,6 +42,7 @@ function createApiAiProcessing(config) {
 
   worker.middleware = {
     query: ware(),
+    request: ware(),
     response: ware()
   };
 
@@ -79,7 +80,14 @@ function createApiAiProcessing(config) {
         let options = message.apiaiOptions || {};
         options.sessionId = worker.sessionIds[channel];
 
-        worker.middleware.query.run(requestText, options, function(err, query, options) {
+        worker.middleware.query.run(requestText, options, function (err, requestText, options) {
+          worker.middleware.request.use((message, requestText, options, bot, next) => {
+            next();
+            callback(requestText, options);
+          });
+        });
+
+        worker.middleware.request.run(message, requestText, options, bot, function(err, message, query, options, bot) {
           let request = isEvent ?
             worker.apiaiService.eventRequest(
               message.event,
