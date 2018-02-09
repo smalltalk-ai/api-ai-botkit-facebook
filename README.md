@@ -78,9 +78,6 @@ apiai.middleware.query.use((message, query, options, bot, next) => {
   next();
 });
 ```
-### Query Middleware (Deprecated)
-
-replaced by Request Middleware
 
 ### Response Middleware
 
